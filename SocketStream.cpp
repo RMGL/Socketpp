@@ -1,6 +1,6 @@
-#include "SocketStream.hpp"
+#include "SocketStream.h"
 
-using namespace Socketpp;
+using namespace socketpp;
 
 void SocketStream::ensureOpen() {
     if (closed) {
@@ -9,10 +9,15 @@ void SocketStream::ensureOpen() {
     }
 }
 
+bool SocketStream::isOpen() {
+    return closed;
+}
+
 std::size_t SocketInputStream::available() {
     ensureOpen();
 
     int bytesAvailable;
+    // NOTE Linux only
     ioctl(socket->getSocketNumber(), FIONREAD, &bytesAvailable);
 
     return bytesAvailable;
@@ -47,8 +52,7 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t 
     return read;
 }
 
-std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char delimitor) {
-    ensureOpen();
+std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char delimiter) {
     std::memset(buffer, 0, size);
     size_t readFromSocket = 0;
     std::vector<char> b;
@@ -59,7 +63,7 @@ std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char de
 
         b.push_back(c);
 
-        if (c == delimitor) {
+        if (c == delimiter) {
             break;
         }
     }
@@ -71,7 +75,7 @@ std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char de
 
 std::string SocketInputStream::readString() {
     char stringBytes[65535];
-    size_t t = readUntil(stringBytes, 65535, '\n');
+    size_t t = readUntil(stringBytes, 65535, '\0');
     char trimmed[t - 1];
 
     std::memcpy(trimmed, stringBytes, t - 1);
@@ -90,8 +94,10 @@ std::vector<char> SocketInputStream::operator>>(std::vector<char>& v) {
     char trimmed[t];
 
     std::memcpy(trimmed, stringBytes, t);
-    std::vector<char> v2(trimmed, trimmed + t);
-    return v2;
+    v.clear();
+    std::copy(v.begin(), v.end(), trimmed);
+    // std::vector<char> v(trimmed, trimmed + t);
+    return v;
 }
 
 std::string SocketInputStream::operator>>(std::string& s) {
@@ -106,7 +112,6 @@ std::size_t SocketOutputStream::write(const char* buffer, std::size_t size, std:
         //TODO error
     }
 
-    // Socket* sock = getSocket();
     size_t written = 0;
     while (written < size) {
         size_t writtenThisRound = socket->write(buffer + written + offset, length - written);
@@ -134,7 +139,7 @@ std::size_t SocketOutputStream::writeString(std::string s) {
     char bytes[bytesSize];
     std::memcpy(bytes, s.c_str(), bytesSize - 1);
 
-    bytes[bytesSize - 1] = '\n';
+    bytes[bytesSize - 1] = '\0';
 
     return write(bytes, bytesSize, 0, bytesSize);
 }

@@ -42,7 +42,7 @@ namespace socketpp{
             *  @brief checks if the socket is open
             *  @return true if open, false otherwise
             */
-            bool isOpen(){ return closed; }
+            bool isOpen(){ return !closed; }
     };
 
     class RWSocket: public BaseSocket{

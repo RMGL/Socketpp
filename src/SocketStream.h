@@ -92,10 +92,19 @@ namespace socketpp{
             std::string readString();
 
             /**
+            * TODO
             *  @brief Reads a char from socket
             *  @return char read 
             */   
-            char readChar();
+            // virtual char readChar();
+
+            /**
+            * TODO
+            *  @brief Reads n char from socket or until stream is empty
+            *  @param n number of char to read
+            *  @return std vector containing the bytes read 
+            */  
+            // virtual std::vector<char> read(long n);
             
             /**
             *  @brief Discars up to n bytes from the socket
@@ -112,17 +121,34 @@ namespace socketpp{
             SocketOutputStream(Socket* sock): SocketStream(sock){}
             ~SocketOutputStream(){}
 
+            /**
+            *  @brief Writes a char to socket
+            *  @return number of bytes written
+            */  
+            std::size_t write(char c);
+
+            /**
+            *  @brief Writes a std vector to socket
+            *  @return number of bytes written
+            */
+            std::size_t write(const std::vector<char> v);
+
+            /**
+            *  @brief Writes n bytes from buffer to socket
+            *  @return number of char written
+            */
             std::size_t write(const char* buffer, std::size_t n);
 
             /**
-            * REVIEW
-            *  @brief Reads a char from socket
-            *  @return char read 
-            */  
+            *  @brief Writes n bytes from buffer to socket from offset
+            *  @return number of char written
+            */
             std::size_t write(const char* buffer, std::size_t size, std::size_t offset, std::size_t n);
-            std::size_t write(char c);
 
-            std::size_t write(const std::vector<char> v);
+            /**
+            *  @brief Writes a string to socket
+            *  @return number of char written
+            */
             std::size_t writeString(std::string s);
 
             std::size_t operator << (const std::vector<char>& v);

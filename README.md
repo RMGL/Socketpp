@@ -17,9 +17,9 @@ socketpp::Socket s("127.0.0.1", 1234); // host address and port
 
 socketpp::SocketInputStream is = s.getInputStream(); // create io streams
 socketpp::SocketOutputStream os = s.getOutputStream();
-is.writeString("Hello");
+os.writeString("Hello");
 
-std::string reply = os.readString();
+std::string reply = is.readString();
 //"world"
 
 ```
@@ -36,10 +36,10 @@ socketpp::Socket s = ss.accept(); // accept new connection
 socketpp::SocketInputStream is = s.getInputStream(); // create io streams
 socketpp::SocketOutputStream os = s.getOutputStream();
 
-std::string msg = os.readString();
+std::string msg = is.readString();
 //"hello"
 
-is.writeString("world");
+os.writeString("world");
 ```
 
 ## TODO list

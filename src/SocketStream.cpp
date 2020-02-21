@@ -10,7 +10,7 @@ void SocketStream::ensureOpen() {
 }
 
 bool SocketStream::isOpen() {
-    return closed;
+    return !closed;
 }
 
 std::size_t SocketInputStream::available() {
@@ -96,7 +96,6 @@ std::vector<char> SocketInputStream::operator>>(std::vector<char>& v) {
     std::memcpy(trimmed, stringBytes, t);
     v.clear();
     std::copy(v.begin(), v.end(), trimmed);
-    // std::vector<char> v(trimmed, trimmed + t);
     return v;
 }
 

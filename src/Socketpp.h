@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <mutex>
 
 #include "SocketStream.h"
 
@@ -46,6 +47,9 @@ namespace socketpp{
     };
 
     class RWSocket: public BaseSocket{
+        private:
+            std::mutex readLock;
+            std::mutex writeLock;
         protected:
             /**
             *  @brief I/o socket class, offers a basic read and write operation for the socket

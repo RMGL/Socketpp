@@ -38,7 +38,7 @@ namespace socketpp{
         public:
 
             /**
-            *  @brief Input stream abstraction, TODO thread safe, writes to socket in a blocking way
+            *  @brief Input stream abstraction, thread safe, reads from socket in a blocking way
             *  @param sock pointer to the socket that the stream is binded
             */
             SocketInputStream(Socket* sock): SocketStream(sock){}
@@ -118,6 +118,11 @@ namespace socketpp{
 
     class SocketOutputStream: public SocketStream{
         public:
+
+            /**
+            *  @brief Output stream abstraction, thread safe, writes to socket in a blocking way
+            *  @param sock pointer to the socket that the stream is binded
+            */
             SocketOutputStream(Socket* sock): SocketStream(sock){}
             ~SocketOutputStream(){}
 

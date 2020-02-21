@@ -11,7 +11,23 @@ void BaseSocket::close() {
     fD = -1;
 }
 
+std::size_t RWSocket::read(char* buffer, std::size_t size) {
+    readLock.lock();
+
+    std::size_t read = recv(getSocketNumber(), buffer, size, 0);
+
+    if (read == static_cast<std::size_t>(-1)) {
+        close();
+        //TODO error
+    }
+    
+    readLock.unlock();
+    return read;
+}
+
 std::size_t RWSocket::write(const char* buffer, std::size_t size) {
+    writeLock.lock();
+
     std::size_t written = send(getSocketNumber(), buffer, size, 0);
 
     if (written == static_cast<std::size_t>(-1)) {
@@ -19,18 +35,8 @@ std::size_t RWSocket::write(const char* buffer, std::size_t size) {
         //TODO error
     }
 
+    writeLock.unlock();
     return written;
-}
-
-std::size_t RWSocket::read(char* buffer, std::size_t size) {
-    std::size_t read = recv(getSocketNumber(), buffer, size, 0);
-
-    if (read == static_cast<std::size_t>(-1)) {
-        close();
-        //TODO error
-    }
-
-    return read;
 }
 
 Socket::Socket(const std::string& host, int port) : RWSocket(::socket(PF_INET, SOCK_STREAM, 0)) {

@@ -6,7 +6,7 @@
 
 namespace socketpp {
 
-class SocketException : public std::exception {
+class SocketStreamException : public std::exception {
    protected:
     std::string message;
 
@@ -14,7 +14,7 @@ class SocketException : public std::exception {
     /** Cosntructor (C++ STL string)
     * @param _message The error message
     */
-    explicit SocketException(std::string _message) {
+    explicit SocketStreamException(std::string _message) {
         message = _message;
     }
 
@@ -22,7 +22,7 @@ class SocketException : public std::exception {
         return message.c_str();
     }
 
-} socketexception;
+} socketstreamexception;
 
 class Socket;
 

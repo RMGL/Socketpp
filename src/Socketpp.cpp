@@ -4,7 +4,7 @@ using namespace socketpp;
 
 void BaseSocket::close() {
     if (closed) {
-        //TODO throw errors, learn how excception work in cpp
+        throw SocketException("Socket is already closed");
     }
 
     closed = true;
@@ -17,8 +17,11 @@ std::size_t RWSocket::read(char* buffer, std::size_t size) {
     std::size_t read = recv(getSocketNumber(), buffer, size, 0);
 
     if (read == static_cast<std::size_t>(-1)) {
+        try{
         close();
-        //TODO error
+        } catch (const SocketException& se){
+            std::cerr << se.what() << std::endl;
+        }
     }
     
     readLock.unlock();
@@ -31,8 +34,11 @@ std::size_t RWSocket::write(const char* buffer, std::size_t size) {
     std::size_t written = send(getSocketNumber(), buffer, size, 0);
 
     if (written == static_cast<std::size_t>(-1)) {
-        close();
-        //TODO error
+        try{
+            close();
+        } catch (const SocketException& se){
+            std::cerr << se.what() << std::endl;
+        }
     }
 
     writeLock.unlock();
@@ -48,8 +54,11 @@ Socket::Socket(const std::string& host, int port) : RWSocket(::socket(PF_INET, S
     hostAddress.sin_addr.s_addr = inet_addr(host.c_str());
 
     if (connect(getSocketNumber(), (struct sockaddr*)&hostAddress, sizeof hostAddress) != 0) {
-        close();
-        // TODO error
+        try{
+            close();
+        } catch (const SocketException& se){
+            std::cerr << se.what() << std::endl;
+        }
     }
 }
 
@@ -72,19 +81,19 @@ ServerSocket::ServerSocket(int port) : BaseSocket(::socket(PF_INET, SOCK_STREAM,
     if (::bind(getSocketNumber(), (struct sockaddr*)&hostAddress, sizeof hostAddress) != 0) {
         close();
         std::cout << "Error bindind" << std::endl;
-        // TODO error
+        throw SocketException("Error binding");
     }
 
     if (::listen(getSocketNumber(), 255) != 0) {
         close();
         std::cout << "Error listening" << std::endl;
-        // TODO error
+        throw SocketException("Error listening");
     }
 }
 
 Socket ServerSocket::accept() {
     if (!isOpen()) {
-        // TODO error
+        throw SocketException("Socket is not open");
     }
 
     struct sockaddr clientAddress;
@@ -92,8 +101,8 @@ Socket ServerSocket::accept() {
     int socketNumber = ::accept(getSocketNumber(), (struct sockaddr*)&clientAddress, &addressSize);
 
     if (socketNumber == -1) {
-        //TODO error
+        throw SocketException("Socket was not able to accept connection");
+    } else{
+        return Socket(socketNumber);
     }
-
-    return Socket(socketNumber);
 }

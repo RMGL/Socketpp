@@ -6,7 +6,7 @@ void SocketStream::ensureOpen() {
     if (closed) {
         std::string error_message = "Socket is not open";
         std::cerr << error_message << std::endl;
-        throw SocketException(error_message);
+        throw SocketStreamException(error_message);
     }
 }
 
@@ -44,9 +44,9 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t 
         std::memset(buffer, 0, size);
 
         if (size > length - offset) {
-            throw SocketException("Size must not be greater than (length - offset)");
+            throw SocketStreamException("Size must not be greater than (length - offset)");
         } else if ((length | offset | size) < 0) {
-            throw SocketException("Size, length and offset must be greater than 0");
+            throw SocketStreamException("Size, length and offset must be greater than 0");
         }
 
         size_t read = 0;
@@ -57,8 +57,8 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t 
         }
 
         return read;
-    } catch (const SocketException& se) {
-        std::cerr << se.what() << std::endl;
+    } catch (const SocketStreamException& sse) {
+        std::cerr << sse.what() << std::endl;
     }
 }
 
@@ -119,9 +119,9 @@ std::size_t SocketOutputStream::write(const char* buffer, std::size_t size, std:
         ensureOpen();
 
         if (size > length - offset) {
-            throw SocketException("Size must not be greater than (length - offset)");
+            throw SocketStreamException("Size must not be greater than (length - offset)");
         } else if ((length | offset | size) < 0) {
-            throw SocketException("Size, length and offset must be greater than 0");
+            throw SocketStreamException("Size, length and offset must be greater than 0");
         }
 
         size_t written = 0;
@@ -132,8 +132,8 @@ std::size_t SocketOutputStream::write(const char* buffer, std::size_t size, std:
         }
 
         return written;
-    } catch(const SocketException& se){
-        std::cerr << se.what() << std::endl;
+    } catch(const SocketStreamException& sse){
+        std::cerr << sse.what() << std::endl;
     }
 }
 

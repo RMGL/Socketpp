@@ -4,8 +4,9 @@ using namespace socketpp;
 
 void SocketStream::ensureOpen() {
     if (closed) {
-        std::cerr << "Socket is not open" << std::endl;
-        // TODO throw exception
+        std::string error_message = "Socket is not open";
+        std::cerr << error_message << std::endl;
+        throw SocketException(error_message);
     }
 }
 
@@ -17,6 +18,9 @@ std::size_t SocketInputStream::available() {
     ensureOpen();
 
     int bytesAvailable;
+    #ifdef _WIN32
+
+    #endif
     // NOTE Linux only
     ioctl(socket->getSocketNumber(), FIONREAD, &bytesAvailable);
 

@@ -2,8 +2,21 @@
 #define SOCKET_STREAM_H
 
 #include "Socketpp.h"
+//#include <exception>
 
 namespace socketpp{
+
+    class SocketException: public std::exception{
+        std::string message();
+
+        virtual const char* message() const throw(){
+            return message.c_str();
+        }
+
+        public:
+            SocketException(std::string _message): message(_message){}
+            
+    } socketexception;
 
     class Socket;
 

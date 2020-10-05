@@ -18,9 +18,9 @@ std::size_t SocketInputStream::available() {
     ensureOpen();
 
     int bytesAvailable;
-    #ifdef _WIN32
-
-    #endif
+#ifdef _WIN32
+    //TODO handle device control in Windows
+#endif
     // NOTE Linux only
     ioctl(socket->getSocketNumber(), FIONREAD, &bytesAvailable);
 
@@ -39,21 +39,27 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size) {
 }
 
 std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t offset, std::size_t length) {
-    ensureOpen();
-    std::memset(buffer, 0, size);
+    try {
+        ensureOpen();
+        std::memset(buffer, 0, size);
 
-    if ((length | offset | size) < 0 || size > length - offset) {
-        //TODO error
+        if (size > length - offset) {
+            throw SocketException("Size must not be greater than (length - offset)");
+        } else if ((length | offset | size) < 0){
+            throw SocketException("Size, length and offset must be greater than 0");
+        }
+
+        size_t read = 0;
+        while (read < size) {
+            size_t readThisRound = socket->read((buffer + read + offset), length - read);
+
+            read += readThisRound;
+        }
+
+        return read;
+    } catch (const SocketException& e){
+        std::cerr << e.what() << std::endl;
     }
-
-    size_t read = 0;
-    while (read < size) {
-        size_t readThisRound = socket->read((buffer + read + offset), length - read);
-
-        read += readThisRound;
-    }
-
-    return read;
 }
 
 std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char delimiter) {

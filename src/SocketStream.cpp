@@ -4,8 +4,9 @@ using namespace socketpp;
 
 void SocketStream::ensureOpen() {
     if (closed) {
-        std::cerr << "Socket is not open" << std::endl;
-        // TODO throw exception
+        std::string error_message = "Socket is not open";
+        std::cerr << error_message << std::endl;
+        throw SocketStreamException(error_message);
     }
 }
 
@@ -17,6 +18,9 @@ std::size_t SocketInputStream::available() {
     ensureOpen();
 
     int bytesAvailable;
+#ifdef _WIN32
+    //TODO handle device control in Windows
+#endif
     // NOTE Linux only
     ioctl(socket->getSocketNumber(), FIONREAD, &bytesAvailable);
 
@@ -35,21 +39,27 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size) {
 }
 
 std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t offset, std::size_t length) {
-    ensureOpen();
-    std::memset(buffer, 0, size);
+    try {
+        ensureOpen();
+        std::memset(buffer, 0, size);
 
-    if ((length | offset | size) < 0 || size > length - offset) {
-        //TODO error
+        if (size > length - offset) {
+            throw SocketStreamException("Size must not be greater than (length - offset)");
+        } else if ((length | offset | size) < 0) {
+            throw SocketStreamException("Size, length and offset must be greater than 0");
+        }
+
+        size_t read = 0;
+        while (read < size) {
+            size_t readThisRound = socket->read((buffer + read + offset), length - read);
+
+            read += readThisRound;
+        }
+
+        return read;
+    } catch (const SocketStreamException& sse) {
+        std::cerr << sse.what() << std::endl;
     }
-
-    size_t read = 0;
-    while (read < size) {
-        size_t readThisRound = socket->read((buffer + read + offset), length - read);
-
-        read += readThisRound;
-    }
-
-    return read;
 }
 
 std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char delimiter) {
@@ -105,20 +115,26 @@ std::string SocketInputStream::operator>>(std::string& s) {
 }
 
 std::size_t SocketOutputStream::write(const char* buffer, std::size_t size, std::size_t offset, std::size_t length) {
-    ensureOpen();
+    try {
+        ensureOpen();
 
-    if ((length | offset | size) < 0 || size > length - offset) {
-        //TODO error
+        if (size > length - offset) {
+            throw SocketStreamException("Size must not be greater than (length - offset)");
+        } else if ((length | offset | size) < 0) {
+            throw SocketStreamException("Size, length and offset must be greater than 0");
+        }
+
+        size_t written = 0;
+        while (written < size) {
+            size_t writtenThisRound = socket->write(buffer + written + offset, length - written);
+
+            written += writtenThisRound;
+        }
+
+        return written;
+    } catch(const SocketStreamException& sse){
+        std::cerr << sse.what() << std::endl;
     }
-
-    size_t written = 0;
-    while (written < size) {
-        size_t writtenThisRound = socket->write(buffer + written + offset, length - written);
-
-        written += writtenThisRound;
-    }
-
-    return written;
 }
 
 std::size_t SocketOutputStream::write(char c) {

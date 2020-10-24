@@ -108,7 +108,7 @@ class Socket : public RWSocket {
             */
     Socket(const std::string& host, int port);
     Socket(int fileDescriptor) : RWSocket(fileDescriptor) {}
-    Socket(const Socket &obj){}
+    Socket(const Socket &obj): RWSocket(obj->getSocketNumber()){}
     ~Socket() {}
 
     /**

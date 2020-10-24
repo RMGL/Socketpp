@@ -102,7 +102,8 @@ Socket ServerSocket::accept() {
 
     if (socketNumber == -1) {
         throw SocketException("Socket was not able to accept connection");
-    } else{
-        return Socket(socketNumber);
     }
+    
+    return Socket(socketNumber);
+    
 }

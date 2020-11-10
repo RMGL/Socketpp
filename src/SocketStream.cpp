@@ -39,6 +39,7 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size) {
 }
 
 std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t offset, std::size_t length) {
+    size_t read = 0;
     try {
         ensureOpen();
         std::memset(buffer, 0, size);
@@ -49,17 +50,16 @@ std::size_t SocketInputStream::read(char* buffer, std::size_t size, std::size_t 
             throw SocketStreamException("Size, length and offset must be greater than 0");
         }
 
-        size_t read = 0;
         while (read < size) {
             size_t readThisRound = socket->read((buffer + read + offset), length - read);
 
             read += readThisRound;
         }
 
-        return read;
     } catch (const SocketStreamException& sse) {
         std::cerr << sse.what() << std::endl;
     }
+    return read;
 }
 
 std::size_t SocketInputStream::readUntil(char* buffer, std::size_t size, char delimiter) {
@@ -115,6 +115,7 @@ std::string SocketInputStream::operator>>(std::string& s) {
 }
 
 std::size_t SocketOutputStream::write(const char* buffer, std::size_t size, std::size_t offset, std::size_t length) {
+    size_t written = 0;
     try {
         ensureOpen();
 
@@ -124,17 +125,16 @@ std::size_t SocketOutputStream::write(const char* buffer, std::size_t size, std:
             throw SocketStreamException("Size, length and offset must be greater than 0");
         }
 
-        size_t written = 0;
         while (written < size) {
             size_t writtenThisRound = socket->write(buffer + written + offset, length - written);
 
             written += writtenThisRound;
         }
 
-        return written;
     } catch(const SocketStreamException& sse){
         std::cerr << sse.what() << std::endl;
     }
+    return written;
 }
 
 std::size_t SocketOutputStream::write(char c) {

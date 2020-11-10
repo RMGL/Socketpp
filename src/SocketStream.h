@@ -22,7 +22,7 @@ class SocketStreamException : public std::exception {
         return message.c_str();
     }
 
-} socketstreamexception;
+};
 
 class Socket;
 

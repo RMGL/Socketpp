@@ -31,7 +31,7 @@ class SocketException : public std::exception {
         return message.c_str();
     }
 
-} socketexception;
+};
 
 class BaseSocket {
    private:
@@ -43,7 +43,7 @@ class BaseSocket {
             *  @brief Base socket class, saves logical information about sockets
             *  @param fileDescriptor socket file descriptor
             */
-    BaseSocket(int fileDescriptor) : fD(fileDescriptor) {}
+    BaseSocket(int fileDescriptor) : fD(fileDescriptor), closed(false) {}
     ~BaseSocket() {}
 
    public:
@@ -51,7 +51,7 @@ class BaseSocket {
             *  @brief getter for socket number
             *  @return socket number
             */
-    int getSocketNumber() { return fD; }
+    int getSocketNumber() const { return fD; }
 
     /**
             *  @brief closes the socket
@@ -108,7 +108,7 @@ class Socket : public RWSocket {
             */
     Socket(const std::string& host, int port);
     Socket(int fileDescriptor) : RWSocket(fileDescriptor) {}
-    Socket(const Socket &obj): RWSocket(obj->getSocketNumber()){}
+    Socket(const Socket &obj): RWSocket(obj.getSocketNumber()){}
     ~Socket() {}
 
     /**

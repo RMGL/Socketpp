@@ -1,4 +1,8 @@
 .vscode
 .vscode/*
-
+.clang-format
 main.cpp
+Client
+Main
+Server
+Server.cpp

@@ -1,6 +1,10 @@
 .vscode
 .vscode/*
 .clang-format
+Build
+Test
+CMakeLists.txt
+
 main.cpp
 Client
 Main

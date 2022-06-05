@@ -1,41 +1,42 @@
 #include "RWSocket.h"
 
-#include <sys/socket.h>
-
 namespace socketpp {
 
 using namespace socketpp::exceptions;
 
+RWSocket::RWSocket(int fileDescriptor) : BaseSocket(fileDescriptor) {}
+
+RWSocket::~RWSocket() = default;
+
 std::size_t RWSocket::read(char* buffer, const std::size_t size) {
     readLock.lock();
-
-    long int read = recv(getSocketNumber(), buffer, size, 0);
-
-    if (read == -1) {
-        try {
-            close();
-        } catch (const socketExceptions::SocketException& se) {
-            std::cerr << se.what() << std::endl;
-        }
-    }
-
+    long int bytesRead = recv(getSocketNumber(), buffer, size, 0);
     readLock.unlock();
-    return static_cast<std::size_t>(read);
+
+    testError(bytesRead);
+
+    return static_cast<std::size_t>(bytesRead);
 }
 
 std::size_t RWSocket::write(const char* buffer, const std::size_t size) {
     writeLock.lock();
-    long int written = send(getSocketNumber(), buffer, size, 0);
+    long int bytesWritten = send(getSocketNumber(), buffer, size, 0);
+    writeLock.unlock();
 
-    if (written == -1) {
-        try {
-            close();
-        } catch (const socketExceptions::SocketException& se) {
-            std::cerr << se.what() << std::endl;
+    testError(bytesWritten);
+    return static_cast<std::size_t>(bytesWritten);
+}
+
+void RWSocket::testError(const long int bytes) {
+    if (bytes <= 0) {
+        close();
+
+        if (bytes == 0) {
+            // throw Connection was closed by peer Exception
+        } else {
+            // throw Unknown Exception
         }
     }
-
-    writeLock.unlock();
-    return static_cast<std::size_t>(written);
 }
+
 }  // namespace socketpp

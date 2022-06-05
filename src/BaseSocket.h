@@ -16,15 +16,15 @@ class BaseSocket {
      *  @brief Base socket class, saves logical information about sockets
      *  @param fileDescriptor socket file descriptor
      */
-    BaseSocket(int fileDescriptor) : fD(fileDescriptor), closed(false) {}
-    ~BaseSocket() { close(); };
+    BaseSocket(int fileDescriptor);
+    ~BaseSocket();
 
    public:
     /**
      *  @brief getter for socket number
      *  @return socket number
      */
-    int getSocketNumber() const { return fD; }
+    int getSocketNumber() const;
 
     /**
      *  @brief closes the socket
@@ -35,6 +35,6 @@ class BaseSocket {
      *  @brief checks if the socket is open
      *  @return true if open, false otherwise
      */
-    bool isOpen() const { return !closed; }
+    bool isOpen() const;
 };
 }  // namespace socketpp

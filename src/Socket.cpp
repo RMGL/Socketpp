@@ -1,13 +1,14 @@
 #include "Socket.h"
-#include "SocketStream.h"
-#include "Exceptions/SocketException.h"
 
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
-#include <memory>
 #include <cstring>
+#include <memory>
+
+#include "Exceptions/SocketException.h"
+#include "SocketStream.h"
 
 using namespace socketpp;
 
@@ -27,11 +28,22 @@ Socket::Socket(const std::string& host, int port)
         } catch (const exceptions::socketExceptions::SocketException& se) {
             std::cerr << se.what() << std::endl;
         }
-    }else {
-        inputStream = std::make_shared<SocketInputStream>(SocketInputStream(*this));
-        outputStream = std::make_shared<SocketOutputStream>(SocketOutputStream(*this));
+    } else {
+        inputStream =
+            std::make_shared<SocketInputStream>(SocketInputStream(*this));
+        outputStream =
+            std::make_shared<SocketOutputStream>(SocketOutputStream(*this));
     }
 }
+
+Socket::Socket(int fileDescriptor) : RWSocket(fileDescriptor) {
+    inputStream = std::make_shared<SocketInputStream>(SocketInputStream(*this));
+    outputStream = std::make_shared<SocketOutputStream>(SocketOutputStream(*this));
+}
+
+Socket::Socket(const Socket& obj) : RWSocket(obj.getSocketNumber()) {}
+
+Socket::~Socket() = default;
 
 std::shared_ptr<SocketInputStream> Socket::getInputStream() {
     return inputStream;
@@ -64,7 +76,8 @@ ServerSocket::ServerSocket(int port)
 
 Socket ServerSocket::accept() {
     if (!isOpen()) {
-        throw exceptions::socketExceptions::SocketException("Socket is not open");
+        throw exceptions::socketExceptions::SocketException(
+            "Socket is not open");
     }
 
     struct sockaddr clientAddress;
@@ -73,7 +86,8 @@ Socket ServerSocket::accept() {
                                 (struct sockaddr*)&clientAddress, &addressSize);
 
     if (socketNumber == -1) {
-        throw exceptions::socketExceptions::SocketException("Socket was not able to accept connection");
+        throw exceptions::socketExceptions::SocketException(
+            "Socket was not able to accept connection");
     }
 
     return Socket(socketNumber);

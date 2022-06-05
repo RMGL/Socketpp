@@ -36,11 +36,10 @@ class SocketStream {
     /**
      *  @brief Base socket stream class, saves logical information about the
      * stream
-     *  @param sock pointer to the socket that the stream is binded
+     *  @param sock pointer to the socket that the stream is bound
      */
     SocketStream(Socket& sock) : closed(false), socket(sock) {}
 
-    SocketStream(const SocketStream&) = default;
     ~SocketStream() = default;
 
     /**
@@ -63,12 +62,7 @@ class SocketInputStream : public SocketStream {
      *  @param sock pointer to the socket that the stream is binded
      */
     SocketInputStream(Socket& sock) : SocketStream(sock) {}
-    // SocketInputStream() = delete;
-    // SocketInputStream(const SocketInputStream&) = delete;
-    // SocketInputStream& operator= (const SocketInputStream&) = delete;
 
-    // SocketInputStream(SocketInputStream&& is) = default;
-    // SocketInputStream& operator= (SocketInputStream&&) = default;
     ~SocketInputStream() = default;
 
     /**
@@ -155,8 +149,6 @@ class SocketOutputStream : public SocketStream {
      *  @param sock pointer to the socket that the stream is binded
      */
     SocketOutputStream(Socket& sock) : SocketStream(sock) {}
-
-    // SocketOutputStream(SocketOutputStream&& os) = default;
 
     ~SocketOutputStream() = default;
 

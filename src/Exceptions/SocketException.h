@@ -16,9 +16,9 @@ class SocketException : public std::exception {
     /** Cosntructor (C++ STL string)
      * @param _message The error message
      */
-    explicit SocketException(std::string _message) : message(_message) {}
+    explicit SocketException(std::string _message);
 
-    virtual const char* what() const throw() { return message.c_str(); }
+    virtual const char* what() const throw();
 };
 }  // namespace socketExceptions
 }  // namespace exceptions

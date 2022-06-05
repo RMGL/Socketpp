@@ -18,10 +18,10 @@ class Socket : public RWSocket {
      */
     Socket(const std::string& host, int port);
 
-    explicit Socket(int fileDescriptor) : RWSocket(fileDescriptor) {}
+    explicit Socket(int fileDescriptor);
 
-    Socket(const Socket& obj) : RWSocket(obj.getSocketNumber()) {}
-    ~Socket() = default;
+    Socket(const Socket& obj);
+    ~Socket();
 
     /**
      *  @brief Opens an input stream for the socket

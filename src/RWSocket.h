@@ -1,8 +1,10 @@
 #pragma once
 
-#include "BaseSocket.h"
+#include <sys/socket.h>
 
 #include <mutex>
+
+#include "BaseSocket.h"
 
 namespace socketpp {
 
@@ -17,8 +19,8 @@ class RWSocket : public BaseSocket {
      * socket
      *  @param fileDescriptor socket file descriptor
      */
-    RWSocket(int fileDescriptor) : BaseSocket(fileDescriptor) {}
-    ~RWSocket() = default;
+    explicit RWSocket(int fileDescriptor);
+    ~RWSocket();
 
    public:
     /**
@@ -36,6 +38,9 @@ class RWSocket : public BaseSocket {
      *  @return number of bytes wrote
      */
     std::size_t write(const char* buffer, const std::size_t n);
+
+   private:
+    void testError(const long int bytes);
 };
 
 }  // namespace socketpp
